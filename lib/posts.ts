@@ -56,15 +56,27 @@ export function getSortedPostsData() {
     };
   });
   // Sort posts by date
-  return allPostsData.sort(({ date: a }, { date: b }) => {
-    if (a < b) {
-      return 1;
-    } else if (a > b) {
-      return -1;
-    } else {
-      return 0;
+  return allPostsData.sort(
+    (a: { id: string; date?: string }, b: { id: string; date?: string }) => {
+      if (a.date && b.date) {
+        if (a.date < b.date) {
+          return 1;
+        } else if (a.date > b.date) {
+          return -1;
+        } else {
+          return 0;
+        }
+      } else {
+        if (a.id < b.id) {
+          return 1;
+        } else if (a.id > b.id) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
     }
-  });
+  );
 }
 
 export function getAllPostIds() {
@@ -92,7 +104,7 @@ export function getAllPostIds() {
   });
 }
 
-export async function getPostData(id) {
+export async function getPostData(id: string) {
   const fullPath = path.join(postsDirectory, `${id}.md`);
   const fileContents = fs.readFileSync(fullPath, "utf8");
 
@@ -100,8 +112,10 @@ export async function getPostData(id) {
   const matterResult = matter(fileContents);
 
   // Use remark to convert markdown into HTML string
-  const processedContent = await remark().use(html).process(matterResult.content)
-  const contentHtml = processedContent.toString()
+  const processedContent = await remark()
+    .use(html)
+    .process(matterResult.content);
+  const contentHtml = processedContent.toString();
 
   // Combine the data with the id
   return {

@@ -4,16 +4,17 @@ import utilStyles from "../styles/utils.module.css";
 import { getSortedPostsData } from "../lib/posts";
 import Link from "next/link";
 import Date from "../components/date";
+import { GetStaticProps } from "next";
 
 // 'getStaticProps' only runs on the server-side
-export async function getStaticProps() {
+export const getStaticProps: GetStaticProps = async () => {
   const allPostsData = getSortedPostsData();
   return {
     props: {
       allPostsData,
     },
   };
-}
+};
 
 // * https://nextjs.org/docs/basic-features/data-fetching/overview
 // * For server side rendering
@@ -35,7 +36,11 @@ export async function getStaticProps() {
 //   return <div>hello {data.name}!</div>
 // }
 
-export default function Home({ allPostsData }) {
+export default function Home({
+  allPostsData,
+}: {
+  allPostsData: { id: string; date?: string; title?: string }[];
+}) {
   return (
     <Layout home>
       <Head>
@@ -54,7 +59,7 @@ export default function Home({ allPostsData }) {
           {allPostsData.map(({ id, date, title }) => (
             <li className={utilStyles.listItem} key={id}>
               <Link href={`/posts/${id}`}>
-                <a>{title}</a>
+                <a>{title ? title : "Untitled"}</a>
               </Link>
               <br />
               <small className={utilStyles.lightText}>
